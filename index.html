@@ -2,18 +2,73 @@
 
 <head>
 	<meta charset="utf-8">
+	<link rel="stylesheet" type="text/css" href="styles.css">
 	<script>
-		// TODO: create a handler
+		function pageShown(event) {
+			if (event.persisted) {
+				let engineButtons = document.querySelectorAll("input[name=engine]");
+				for (button of engineButtons) {
+					button.disabled = false;
+				}
+			}
+		}
+		function setSearchEngine(event) {
+			let selectedEngine = document.querySelector("input[name=engine]:checked");
+
+			if(!selectedEngine) {
+				alert("Please select a search engine!");
+				event.preventDefault();
+				return;
+			}
+
+			let queryInput = document.querySelector("input[name=q]");
+			if (queryInput.value === "") {
+				alert("Please enter a search query!");
+				queryInput.focus();
+				event.preventDefault();
+				return;
+			}
+
+			let actions = {
+				"google": "https://www.google.com/search",
+				"duckDuckGo": "https://duckduckgo.com/",
+				"bing": "https://www.bing.com/",
+				"ask": "https://www.ask.com/web"
+			}
+
+			let form = document.querySelector("#searchForm");
+			form.action = actions[selectedEngine.value];
+			//this will cause the search to ONLY search the query and not
+			//?q="searchQuery"&engine="google"
+			//selectedEngine.removeAttribute('name');
+			//however, if I do this, afterwards, if user presses the back 
+			//button, the form doesn't work unless page is reloaded
+
+			//setting disabled to true will force it to not send when we submit
+			//then the pageShown function (above) will re-enable all 4 of our
+			//buttons when the page loads
+			selectedEngine.disabled = true;
+		}
     window.addEventListener("load", function(){
-        // TODO: register the handler
+        let form = document.querySelector("#searchForm");
+		form.addEventListener("submit", function(event) {
+			setSearchEngine(event);
+		});
     });
+	window.addEventListener("pageshow", pageShown, false);
 	</script>
 </head>
 
 <body>
+	<h1>Search Engine Selector 9000</h1>
 
 	<form id="searchForm">
-    <!-- TODO: add form elements -->
+	<input type="text" name="q" class="query"/><br>
+	<label>Google<input type="radio" name="engine" value="google"/></label>
+	<label>DuckDuckGo<input type="radio" name="engine" value="duckDuckGo"/></label>
+	<label>Bing<input type="radio" name="engine" value="bing"/></label>
+	<label>Ask<input type="radio" name="engine" value="ask"/></label><br>
+	<button>Go!</button>
 	</form>
 
 </body>
